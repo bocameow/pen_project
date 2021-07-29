@@ -142,7 +142,7 @@ void* server_send_data(void* argv)
 	    //s1.set_freq(feq);
 	    s1.SerializeToArray(buf, BUFSIZE);
 	    send(new_socket, buf, BUFSIZE, 0);
-	    cout << c << endl;
+	    cout << c << endl;;
 	    c++;
 	    // 3-axis data pack
 	    // ===========================================
