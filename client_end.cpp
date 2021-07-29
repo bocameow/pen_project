@@ -69,6 +69,10 @@ void *client_recv_data(void *argv)
     code::file s2;
     char old_flag;
     char tmp_flag;
+    struct timespec ts1, ts2;
+    unsigned long long ms1, ms2, diff;
+    double d;
+    double feq;
     
     pthread_mutex_lock( &mu);
     old_flag=flag;
@@ -84,10 +88,19 @@ void *client_recv_data(void *argv)
         }
         if(tmp_flag == '1'){
             //recv_data
+            timespec_get(&ts1, TIME_UTC);
             recv( sock , buf, BUFSIZE, MSG_WAITALL);
             s2.ParseFromArray(buf, BUFSIZE);
             //cout << "recv OK\n";
             cout << s2.freq()<< endl;
+            timespec_get(&ts2, TIME_UTC);
+            ms1 = ts1.tv_nsec;
+            ms2 = ts2.tv_nsec;
+            diff = ms2-ms1;
+            d= diff/1000000000.0;
+            feq= 1/d;
+            cout << "sec(s):" << d << endl;
+            cout << "freq(Hz): " << feq << endl;
             /*cout << endl;
             cout<<"X: "<<s2.x()<<endl;
             cout<<"Y: "<<s2.y()<<endl;
