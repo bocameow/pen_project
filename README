@@ -3,8 +3,25 @@
 =================
 setMacro
 use alais:
-source setMacro.sh
+code: source setMacro.sh
 
+Do this project in linux
+
+server:
+1. Use setMacro code :server
+
+2. Don't use setMacro code:
+   complier :g++ -o server.out server_end.cpp pen.pb.cc -lprotobuf -lpthread
+   run :./server.out
+   
+client:
+1. Use setMacro code :client
+
+2. Don't use setMacro code:
+   complier :g++ -o client.out client_end.cpp pen.pb.cc -lprotobuf -lpthread
+   run :./client.out
+
+===================
 use git:
 //save code
 git add .
