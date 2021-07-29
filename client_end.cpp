@@ -28,6 +28,8 @@ void *client_send_cmd(void*);
 
 int main(int argc, char const *argv[])
 {
+    //===========================================
+    //socket  connect
     int sock = 0, valread;
     struct sockaddr_in serv_addr;
 
@@ -49,7 +51,14 @@ int main(int argc, char const *argv[])
         printf("\nConnection Failed \n");
         return -1;
     }else{cout<<"Socket connect!\n";}
-
+    
+    //===============================================
+    //thread
+    /*
+     t1 is recv 3-axis data from server
+     t2 is send cmd to server
+     do send cmd to server and recv 3-axis data from server
+    */
     pthread_t t1, t2;
     pthread_mutex_init(&mu, 0);
     pthread_create(&t2,NULL,client_send_cmd, &sock);
@@ -59,7 +68,9 @@ int main(int argc, char const *argv[])
     pthread_mutex_destroy(&mu);
     return 0;
 }
-
+/*
+  recv 3-axis data from server
+*/
 void *client_recv_data(void *argv)
 {
     int sock = *(int *)argv;
@@ -85,10 +96,11 @@ void *client_recv_data(void *argv)
             cout << old_flag << "->" << tmp_flag << endl;
         }
         if(tmp_flag == '1'){
-            //recv_data
+            //recv_data 
             //test speed
             timespec_get(&ts1, TIME_UTC);
             recv( sock , buf, BUFSIZE, MSG_WAITALL);
+            //unpack
             s2.ParseFromArray(buf, BUFSIZE);
             //cout << "recv OK\n";
             cout << s2.freq()<< endl;
@@ -116,7 +128,9 @@ void *client_recv_data(void *argv)
     }
     pthread_exit((void *)0);
 }
-
+/*
+  send cmd to server
+*/
 void *client_send_cmd(void* argv){
     int new_socket = *(int *)argv;
     char tmp_flag;

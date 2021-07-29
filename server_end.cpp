@@ -30,11 +30,13 @@ void* server_send_data(void*);
 void *server_recv_cmd(void*);
 
 int main(){
+    //socket init code
     int server_fd, new_socket, valread;
     struct sockaddr_in address;
     int opt = 1;
     int addrlen = sizeof(address);
-       
+    //===========================================
+    //socket connect 
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0){
         perror("socket failed");
@@ -68,6 +70,12 @@ int main(){
     }else{cout<<"Socket accept!\n";}
     
     //===============================================
+    //thread
+    /*
+     t1 is send 3-axis data to client
+     t2 is recv cmd from client
+     do recv cmd from client and send 3-axis data to client
+    */
     pthread_t t1, t2;
     pthread_mutex_init(&mu, 0);
     pthread_create(&t2,NULL,server_recv_cmd, &new_socket);
@@ -75,10 +83,16 @@ int main(){
     pthread_join(t1, 0);
     pthread_join(t2, 0);
     pthread_mutex_destroy(&mu);
+    //================================================
     return 0;
 }
+/*
+ get and send 3-axis data to client
+*/
 void* server_send_data(void* argv)
 {
+    //===============================================
+    // 3-axis init code
     int new_socket = *(int *)argv;
     char reg[1] = {0x32};
     char data[6] ={0};
@@ -87,8 +101,6 @@ void* server_send_data(void* argv)
     code::file s2, s1;
     char tmp_flag;
     int c=0;
-     //===============================================
-    // 3-axis init code
     int file;
     char *bus = "/dev/i2c-1";
     if ((file = open(bus, O_RDWR)) < 0) {
@@ -109,8 +121,8 @@ void* server_send_data(void* argv)
     sleep(1);
     cout<<"===============ready to send=================\n";
     // ===========================================
+    //get and send 3-axis data
     while(1){
-        //usleep(1*1000000);
 	pthread_mutex_lock( &mu);
 	tmp_flag=flag;
 	pthread_mutex_unlock( &mu);
@@ -127,9 +139,11 @@ void* server_send_data(void* argv)
 		yAccl = ((data[3] & 0x1F) * 256 + (data[2] & 0xFF));
 		zAccl = ((data[5] & 0x1F) * 256 + (data[4] & 0xFF));
 	    }
-	  /*cout << "Acceleration in X-Axis : " << xAccl << std::endl;
+	  /*
+	    cout << "Acceleration in X-Axis : " << xAccl << std::endl;
 	    cout << "Acceleration in Y-Axis : " << yAccl << std::endl;
-	    cout << "Acceleration in Z-Axis : " << zAccl << std::endl;*/
+	    cout << "Acceleration in Z-Axis : " << zAccl << std::endl;
+	  */
 	    s1.set_x(xAccl);
 	    s1.set_y(yAccl);
 	    s1.set_z(zAccl);
@@ -151,7 +165,9 @@ void* server_send_data(void* argv)
     cout<<endl;
     pthread_exit((void *)0);
 }
-
+/*
+  recv cmd from client
+*/
 void *server_recv_cmd(void* argv){
     cout<<"===================================\n";
     int sock = *(int *)argv;
