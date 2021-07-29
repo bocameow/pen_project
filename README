@@ -1,0 +1,14 @@
+
+2021/07/29
+=================
+setMacro
+use alais:
+source setMacro.sh
+
+use git:
+//save code
+git add .
+//set commit
+git commit -m "commit name"
+//push on git_hub
+git push -u origin master
