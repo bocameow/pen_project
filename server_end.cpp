@@ -28,9 +28,6 @@ pthread_mutex_t mu;
 
 void* server_send_data(void*);
 void *server_recv_cmd(void*);
-/*int send_data(int , int );
-char recv_cmd(int);*/
-
 
 int main(){
     int server_fd, new_socket, valread;
@@ -119,7 +116,6 @@ void* server_send_data(void* argv)
 	pthread_mutex_unlock( &mu);
         if(tmp_flag == '1'){
 	    // 3-axis get XYZ data
-	    
 	    write(file, reg, 1);
 	    if(read(file, data, 6) != 6){
 		std::cout << "Erorr : Input/output Erorr " << std::endl;
@@ -131,20 +127,18 @@ void* server_send_data(void* argv)
 		yAccl = ((data[3] & 0x1F) * 256 + (data[2] & 0xFF));
 		zAccl = ((data[5] & 0x1F) * 256 + (data[4] & 0xFF));
 	    }
-	    //cout<<"i: "<<i<<endl;
-	    /*cout << "Acceleration in X-Axis : " << xAccl << std::endl;
+	  /*cout << "Acceleration in X-Axis : " << xAccl << std::endl;
 	    cout << "Acceleration in Y-Axis : " << yAccl << std::endl;
 	    cout << "Acceleration in Z-Axis : " << zAccl << std::endl;*/
 	    s1.set_x(xAccl);
 	    s1.set_y(yAccl);
 	    s1.set_z(zAccl);
 	    s1.set_freq(c);
-	    //s1.set_freq(feq);
+	    // 3-axis data pack
 	    s1.SerializeToArray(buf, BUFSIZE);
 	    send(new_socket, buf, BUFSIZE, 0);
 	    cout << c << endl;;
 	    c++;
-	    // 3-axis data pack
 	    // ===========================================
             //cout<<"Send data OK\n";
         }

@@ -25,8 +25,6 @@ pthread_mutex_t mu;
 
 void *client_recv_data(void*);
 void *client_send_cmd(void*);
-/*int recv_data(int);
-void send_cmd(int, char);*/
 
 int main(int argc, char const *argv[])
 {
@@ -88,6 +86,7 @@ void *client_recv_data(void *argv)
         }
         if(tmp_flag == '1'){
             //recv_data
+            //test speed
             timespec_get(&ts1, TIME_UTC);
             recv( sock , buf, BUFSIZE, MSG_WAITALL);
             s2.ParseFromArray(buf, BUFSIZE);
@@ -101,7 +100,7 @@ void *client_recv_data(void *argv)
             feq= 1/d;
             cout << "sec(s):" << d << endl;
             cout << "freq(Hz): " << feq << endl;
-            /*cout << endl;
+           /*cout << endl;
             cout<<"X: "<<s2.x()<<endl;
             cout<<"Y: "<<s2.y()<<endl;
             cout<<"Z: "<<s2.z()<<endl;
