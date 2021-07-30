@@ -7,6 +7,12 @@ code: source setMacro.sh
 
 Do this project in linux
 
+/*
+This project is on the school network. 
+If you want to use this project in another internet,
+you need to change IP address in client_end.cpp "#define IP_ADDR "
+*/
+
 server:
 1. Use setMacro code :server
 
