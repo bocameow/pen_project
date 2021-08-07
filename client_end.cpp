@@ -15,8 +15,9 @@ using namespace std;
 #include <thread>
 #include <memory.h>
 #include "pen.pb.h"
-
-#define IP_ADDR "10.21.11.19"
+#include <chrono>
+//10.21.11.19
+#define IP_ADDR "192.168.43.189"
 #define PORT 8080
 #define BUFSIZE 100
 char flag='2';
@@ -78,10 +79,14 @@ void *client_recv_data(void *argv)
     code::file s2;
     char old_flag;
     char tmp_flag;
-    struct timespec ts1, ts2;
-    unsigned long long ms1, ms2, diff;
-    double d;
-    double feq;
+    // ---------------------------------------
+    // time
+    using std::chrono::high_resolution_clock;
+    using std::chrono::duration_cast;
+    using std::chrono::duration;
+    using std::chrono::milliseconds;
+    auto t1 = high_resolution_clock::now();
+    // ---------------------------------------
     
     pthread_mutex_lock( &mu);
     old_flag=flag;
@@ -98,20 +103,17 @@ void *client_recv_data(void *argv)
         if(tmp_flag == '1'){
             //recv_data 
             //test speed
-            timespec_get(&ts1, TIME_UTC);
             recv( sock , buf, BUFSIZE, MSG_WAITALL);
             //unpack
             s2.ParseFromArray(buf, BUFSIZE);
-            //cout << "recv OK\n";
+            
+            auto t2 = high_resolution_clock::now();
+            duration<double, std::milli> ms_double = t2 - t1;
+            t1 = t2;
             cout << s2.freq()<< endl;
-            timespec_get(&ts2, TIME_UTC);
-            ms1 = ts1.tv_nsec;
-            ms2 = ts2.tv_nsec;
-            diff = ms2-ms1;
-            d= diff/1000000000.0;
-            feq= 1/d;
-            cout << "sec(s):" << d << endl;
-            cout << "freq(Hz): " << feq << endl;
+            cout << "Sensor: " << s2.code();
+            cout <<"============: Time: "<< ms_double.count() << "ms, "<< 1/ms_double.count()*1000<<"Hz\n";
+            //cout << "recv OK\n";
            /*cout << endl;
             cout<<"X: "<<s2.x()<<endl;
             cout<<"Y: "<<s2.y()<<endl;

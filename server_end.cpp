@@ -127,6 +127,7 @@ void* server_send_data(void* argv)
 	tmp_flag=flag;
 	pthread_mutex_unlock( &mu);
         if(tmp_flag == '1'){
+	    //usleep(0.1*1000000); 
 	    // 3-axis get XYZ data
 	    write(file, reg, 1);
 	    if(read(file, data, 6) != 6){
@@ -148,6 +149,7 @@ void* server_send_data(void* argv)
 	    s1.set_y(yAccl);
 	    s1.set_z(zAccl);
 	    s1.set_freq(c);
+	    s1.set_code("3-axis\n");
 	    // 3-axis data pack
 	    s1.SerializeToArray(buf, BUFSIZE);
 	    send(new_socket, buf, BUFSIZE, 0);
