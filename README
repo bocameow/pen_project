@@ -27,6 +27,7 @@ client:
    complier :g++ -o client.out client_end.cpp pen.pb.cc -lprotobuf -lpthread
    run :./client.out
 
+//find IP address: ifconfig
 ===================
 use git:
 //save code

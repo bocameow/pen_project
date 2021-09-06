@@ -18,7 +18,7 @@ using namespace std;
 #include <chrono>
 //10.21.11.19
 #define IP_ADDR "192.168.43.146"
-#define PORT 8845
+#define PORT 8843
 #define BUFSIZE 100
 char flag='2';
 pthread_mutex_t mu;
@@ -110,15 +110,16 @@ void *client_recv_data(void *argv)
             auto t2 = high_resolution_clock::now();
             duration<double, std::milli> ms_double = t2 - t1;
             t1 = t2;
-            cout << s2.freq()<< endl;
+            //cout << s2.freq()<< endl;
             cout << "Sensor: " << s2.code();
             cout <<"============: Time: "<< ms_double.count() << "ms, "<< 1/ms_double.count()*1000<<"Hz\n";
             //cout << "recv OK\n";
-           /*cout << endl;
+            cout << endl;
             cout<<"X: "<<s2.x()<<endl;
             cout<<"Y: "<<s2.y()<<endl;
             cout<<"Z: "<<s2.z()<<endl;
-            cout << endl;*/
+            cout<<"ADC: "<<s2.freq()<<endl;
+            cout << endl;
         }
         else if(tmp_flag == '2'){
             old_flag=tmp_flag;

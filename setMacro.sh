@@ -1,4 +1,6 @@
 alias server="g++ -o server.out server_end.cpp pen.pb.cc -lprotobuf -lpthread; ./server.out; rm server.out"
 alias client="g++ -o client.out client_end.cpp pen.pb.cc -lprotobuf -lpthread; ./client.out; rm client.out"
+alias adcserver="g++ -o adc_server.out Server_ADC.cxx pen.pb.cc -lprotobuf -lpthread -lwiringPi; ./adc_server.out; rm adc_server.out"
+alias adcclient="g++ -o adc_client.out Client_ADC.cxx pen.pb.cc -lprotobuf -lpthread -lwiringPi; ./adc_client.out; rm adc_client.out"
 alias add="git add ."
 alias push="git push -u origin master"

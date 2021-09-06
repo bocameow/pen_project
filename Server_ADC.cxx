@@ -20,7 +20,16 @@ using namespace std;
 #include <time.h>
 #include <stdlib.h>
 #include "pen.pb.h"
-#define PORT 8845
+#include "tm1637.h"
+#include <signal.h>
+#include <iostream>
+#include <wiringPi.h>
+#include <mcp3004.h>
+
+
+#define SPI_CHAN 0   //(CE0)
+#define MY_PIN 12345
+#define PORT 8843
 #define BUFSIZE 100
 char flag='2';
 pthread_mutex_t mu;
@@ -86,6 +95,11 @@ int main(){
     //================================================
     return 0;
 }
+void signaux(int sigtype)
+	{
+	TMclear();
+	exit(0);
+	}
 /*
  get and send 3-axis data to client
 */
@@ -121,42 +135,66 @@ void* server_send_data(void* argv)
     sleep(1);
     cout<<"===============ready to send=================\n";
     // ===========================================
+    //ADC init
+    int x[8],i,s;
+    float v[8];
+    float k = 5000.0/1024;   //ADC out
+
+    wiringPiSetup() ;
+    mcp3004Setup (MY_PIN, SPI_CHAN); // 3004 and 3008 are the same 4/8 channels
+    signal(SIGINT,signaux);
+    signal(SIGTERM,signaux);
+    TMsetup(29,28);
+    TMsetBrightness(7);
+    //============================================
     //get and send 3-axis data
     while(1){
 	pthread_mutex_lock( &mu);
 	tmp_flag=flag;
 	pthread_mutex_unlock( &mu);
         if(tmp_flag == '1'){
-	    //usleep(0.1*1000000); 
-	    // 3-axis get XYZ data
-	    write(file, reg, 1);
-	    if(read(file, data, 6) != 6){
-		std::cout << "Erorr : Input/output Erorr " << std::endl;
-		exit(1);
+	    //usleep(0.1*1000000);
+	    for(s=0;s<500;s++){
+		// 3-axis get XYZ data
+		write(file, reg, 1);
+		if(read(file, data, 6) != 6){
+		    std::cout << "Erorr : Input/output Erorr " << std::endl;
+		    exit(1);
+		}
+		else
+		{
+		    xAccl = ((data[1] & 31) * 256 + (data[0] & 0xFF));
+		    yAccl = ((data[3] & 0x1F) * 256 + (data[2] & 0xFF));
+		    zAccl = ((data[5] & 0x1F) * 256 + (data[4] & 0xFF));
+		}
+	      /*
+		cout << "Acceleration in X-Axis : " << xAccl << std::endl;
+		cout << "Acceleration in Y-Axis : " << yAccl << std::endl;
+		cout << "Acceleration in Z-Axis : " << zAccl << std::endl;
+	      */
+	      //=================================
+	      //ADC out
+	      for (i=0;i<8;i++)
+		    {
+			    x[i] = analogRead (MY_PIN + i ) ;
+			    v[i] = k * (float)(x[i]);
+		    }
+		cout << "ADC: " << v[0] << endl;
+	      //==================================
+		s1.set_x(xAccl);
+		s1.set_y(yAccl);
+		s1.set_z(zAccl);
+		s1.set_freq(v[0]);
+		s1.set_code("3-axis\n");
+		// 3-axis data pack
+		s1.SerializeToArray(buf, BUFSIZE);
+		send(new_socket, buf, BUFSIZE, 0);
+		cout << c << endl;;
+		c++;
+		// ===========================================
+		//cout<<"Send data OK\n";
 	    }
-	    else
-	    {
-		xAccl = ((data[1] & 31) * 256 + (data[0] & 0xFF));
-		yAccl = ((data[3] & 0x1F) * 256 + (data[2] & 0xFF));
-		zAccl = ((data[5] & 0x1F) * 256 + (data[4] & 0xFF));
-	    }
-	  /*
-	    cout << "Acceleration in X-Axis : " << xAccl << std::endl;
-	    cout << "Acceleration in Y-Axis : " << yAccl << std::endl;
-	    cout << "Acceleration in Z-Axis : " << zAccl << std::endl;
-	  */
-	    s1.set_x(xAccl);
-	    s1.set_y(yAccl);
-	    s1.set_z(zAccl);
-	    s1.set_freq(c);
-	    s1.set_code("3-axis\n");
-	    // 3-axis data pack
-	    s1.SerializeToArray(buf, BUFSIZE);
-	    send(new_socket, buf, BUFSIZE, 0);
-	    cout << c << endl;;
-	    c++;
-	    // ===========================================
-            //cout<<"Send data OK\n";
+	    TMshowNumber(v[0],0,false,4,0);
         }
         else if(tmp_flag == '2'){
             continue;
