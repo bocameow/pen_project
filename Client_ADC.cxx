@@ -16,8 +16,8 @@ using namespace std;
 #include <memory.h>
 #include "pen.pb.h"
 #include <chrono>
-//10.21.11.19
-#define IP_ADDR "192.168.43.146"
+//10.21.23.192 /192.168.43.146
+#define IP_ADDR "10.21.23.192"
 #define PORT 8843
 #define BUFSIZE 100
 char flag='2';

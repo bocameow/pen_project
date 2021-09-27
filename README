@@ -1,6 +1,8 @@
 
 2021/07/29
 =================
+range: 0-8191
+
 setMacro
 use alais:
 code: source setMacro.sh
